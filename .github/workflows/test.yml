@@ -13,21 +13,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
 
       - name: Install dependencies
         run: npm install
 
-      - name: Convert line endings + fix Jest permission
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dos2unix
-          dos2unix ./node_modules/jest/bin/jest.js
-          chmod +x ./node_modules/jest/bin/jest.js
+      - name: Fix bcrypt issue
+        run: npm rebuild bcrypt --build-from-source
 
       - name: Run tests
         run: npm test
