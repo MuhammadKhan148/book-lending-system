@@ -13,6 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -20,7 +21,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Fix bcrypt issue
+      - name: Fix node-pre-gyp permission
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dos2unix
+          # Convert line endings in case they are Windows-style
+          dos2unix ./node_modules/.bin/node-pre-gyp || true
+          # Grant execution permission
+          chmod +x ./node_modules/.bin/node-pre-gyp || true
+
+      - name: Rebuild bcrypt from source
         run: npm rebuild bcrypt --build-from-source
 
       - name: Run tests
