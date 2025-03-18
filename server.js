@@ -20,5 +20,18 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use("/auth", authRoutes);
 app.use("/books", bookRoutes);
 
+// Add root route
+app.get("/", (req, res) => {
+    res.json({ message: "Welcome to Book Lending System API" });
+});
+
+// Error handling middleware should be last
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

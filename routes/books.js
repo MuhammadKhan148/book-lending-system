@@ -18,9 +18,18 @@ const authMiddleware = (req, res, next) => {
 
 router.post("/lend", authMiddleware, async (req, res) => {
     const { title, author, category, borrower, dueDate } = req.body;
-    const book = new Book({ title, author, category, borrower, dueDate, userId: req.user.userId });
-    await book.save();
-    res.json({ message: "Book lent successfully" });
+
+    if (!title || !author || !borrower || !dueDate) {
+        return res.status(400).json({ error: "All fields are required" });
+    }
+
+    try {
+        const book = new Book({ title, author, category, borrower, dueDate, userId: req.user.userId });
+        await book.save();
+        res.json({ message: "Book lent successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Error saving book" });
+    }
 });
 
 router.get("/borrowed", authMiddleware, async (req, res) => {
