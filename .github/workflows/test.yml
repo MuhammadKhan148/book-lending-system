@@ -5,6 +5,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
       mongo:
         image: mongo:5.0
@@ -12,14 +13,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Install dependencies
         run: npm install
+
+      - name: Convert line endings + fix Jest permission
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dos2unix
+          dos2unix ./node_modules/jest/bin/jest.js
+          chmod +x ./node_modules/jest/bin/jest.js
+
       - name: Run tests
-        run: npx jest --detectOpenHandles --forceExit
+        run: npm test
         env:
           MONGO_URI: mongodb://localhost:27017/book-lending
           JWT_SECRET: "secret"
