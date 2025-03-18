@@ -5,13 +5,30 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # 1. Spin up a MongoDB service container so `mongodb://localhost:27017` is valid.
+    services:
+      mongo:
+        image: mongo:5.0
+        ports: ['27017:27017']
+
     steps:
+      # 2. Check out the repo so we can access code
       - uses: actions/checkout@v3
+
+      # 3. Install Node version
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
+      # 4. Install dependencies
       - name: Install dependencies
         run: npm install
+      
+      # 5. Run tests
       - name: Run tests
         run: npm test
+        env:
+          MONGO_URI: mongodb://localhost:27017/book-lending
+          JWT_SECRET: 'secret'
